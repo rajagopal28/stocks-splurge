@@ -32,4 +32,9 @@ public class StockController {
     public ResponseEntity<Stock> getStock(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(service.getStockById(id));
     }
+
+    @PutMapping(value = StockAppUtil.ENDPOINT_STOCKS_WITH_ID)
+    public ResponseEntity<Stock> updateStock(@PathVariable(name = "id") Long id,@RequestBody Stock stock) {
+        return ResponseEntity.ok(service.updateStock(id, stock));
+    }
 }

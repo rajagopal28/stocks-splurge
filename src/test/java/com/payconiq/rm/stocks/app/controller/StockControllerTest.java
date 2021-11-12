@@ -70,4 +70,20 @@ public class StockControllerTest {
 
         Mockito.verify(mockService).getStockById(id);
     }
+
+    @Test
+    public void testShouldUpdateOneStock() {
+        Stock expected = Mockito.mock(Stock.class);
+        long id = 45;
+        Mockito.when(mockService.updateStock(id, expected)).thenReturn(expected);
+
+        ResponseEntity<Stock> getStockResponse = controller.updateStock(id, expected);
+
+        Assert.assertNotNull(getStockResponse);
+        Assert.assertEquals(HttpStatus.OK, getStockResponse.getStatusCode());
+        Assert.assertNotNull(getStockResponse.getBody());
+        Assert.assertEquals(expected, getStockResponse.getBody());
+
+        Mockito.verify(mockService).updateStock(id, expected);
+    }
 }
