@@ -1,5 +1,6 @@
 package com.payconiq.rm.stocks.app.service;
 
+import com.payconiq.rm.stocks.app.exception.*;
 import com.payconiq.rm.stocks.app.model.Stock;
 import com.payconiq.rm.stocks.app.repository.StockRepository;
 import com.payconiq.rm.stocks.app.util.StockAppUtil;
@@ -54,7 +55,7 @@ public class StockServiceTest {
            service.addNewStock(s1);
            Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof InvalidCreateRequestException);
             Assert.assertEquals(StockAppUtil.ERROR_INVALID_REQUEST, e.getMessage());
             Mockito.verify(mockRepository, Mockito.never()).findByName(sname);
             Mockito.verify(mockRepository, Mockito.never()).save(s1);
@@ -75,7 +76,7 @@ public class StockServiceTest {
             service.addNewStock(s1);
             Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof DuplicateStockException);
             Assert.assertEquals(StockAppUtil.FN_ERROR_STOCK_WITH_NAME_PRESENT.apply(sname), e.getMessage());
             Mockito.verify(mockRepository).findByName(sname);
             Mockito.verify(mockRepository, Mockito.never()).save(s1);
@@ -121,7 +122,7 @@ public class StockServiceTest {
             service.getStockById(id);
             Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof StockNotFoundException);
             Assert.assertEquals(StockAppUtil.FN_ERROR_STOCK_WITH_ID_NOT_PRESENT.apply(id), e.getMessage());
             Mockito.verify(mockRepository).findById(id);
         }
@@ -149,7 +150,7 @@ public class StockServiceTest {
             service.deleteStock(id);
             Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof StockNotFoundException);
             Assert.assertEquals(StockAppUtil.FN_ERROR_STOCK_WITH_ID_NOT_PRESENT.apply(id), e.getMessage());
             Mockito.verify(mockRepository).findById(id);
             Mockito.verify(mockRepository, Mockito.never()).delete(Mockito.any(Stock.class));
@@ -169,7 +170,7 @@ public class StockServiceTest {
             service.deleteStock(id);
             Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof LockWindowEnabledException);
             Assert.assertEquals(StockAppUtil.ERROR_LOCK_WINDOW_ENABLED, e.getMessage());
             Mockito.verify(mockRepository).findById(id);
             Mockito.verify(mockRepository, Mockito.never()).delete(expected);
@@ -227,7 +228,7 @@ public class StockServiceTest {
             service.updateStock(id, expected);
             Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof StockNotFoundException);
             Assert.assertEquals(StockAppUtil.FN_ERROR_STOCK_WITH_ID_NOT_PRESENT.apply(id), e.getMessage());
             Mockito.verify(mockRepository).findById(id);
             Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(Stock.class));
@@ -243,7 +244,7 @@ public class StockServiceTest {
             Mockito.when(expected.getName()).thenReturn("Stock1");
             Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof InvalidUpdateRequestException);
             Assert.assertEquals(StockAppUtil.ERROR_INVALID_UPDATE_REQUEST, e.getMessage());
             Mockito.verify(mockRepository, Mockito.never()).findById(id);
             Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(Stock.class));
@@ -266,7 +267,7 @@ public class StockServiceTest {
             service.updateStock(id, expected);
             Assert.fail("Should not come here!");
         } catch (Exception e) {
-            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertTrue(e instanceof LockWindowEnabledException);
             Assert.assertEquals(StockAppUtil.ERROR_LOCK_WINDOW_ENABLED, e.getMessage());
             Mockito.verify(mockRepository).findById(id);
             Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(Stock.class));

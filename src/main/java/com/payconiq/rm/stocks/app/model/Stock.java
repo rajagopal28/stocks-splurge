@@ -14,7 +14,7 @@ public class Stock {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
     private String name;
-    private long timeCreated;
     private double currentPrice;
+    private long timeCreated;
     private long lastUpdated;
 }

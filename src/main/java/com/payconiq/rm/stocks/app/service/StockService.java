@@ -1,5 +1,6 @@
 package com.payconiq.rm.stocks.app.service;
 
+import com.payconiq.rm.stocks.app.exception.*;
 import com.payconiq.rm.stocks.app.model.Stock;
 import com.payconiq.rm.stocks.app.repository.StockRepository;
 import com.payconiq.rm.stocks.app.util.StockAppUtil;
@@ -21,8 +22,7 @@ public class StockService {
             // validate if the name is not there
             Optional<Stock> stockByName = stockRepository.findByName(stock.getName());
             if(stockByName.isPresent()) {
-                //TODO:: create custom exception
-                throw new RuntimeException(StockAppUtil.FN_ERROR_STOCK_WITH_NAME_PRESENT.apply(stock.getName()));
+                throw new DuplicateStockException(stock.getName());
             }
             // set timestamp values
             long now = Instant.now().getEpochSecond();
@@ -31,8 +31,7 @@ public class StockService {
             // persist the stock object
             return stockRepository.save(stock);
         } else {
-            //TODO:: create custom exception
-            throw new RuntimeException(StockAppUtil.ERROR_INVALID_REQUEST);
+            throw new InvalidCreateRequestException();
         }
     }
 
@@ -44,8 +43,7 @@ public class StockService {
         Optional<Stock> foundStock = stockRepository.findById(id);
         // if not present throw error
         if (foundStock.isEmpty()) {
-            // TODO: custom exception
-            throw new RuntimeException(StockAppUtil.FN_ERROR_STOCK_WITH_ID_NOT_PRESENT.apply(id));
+            throw new StockNotFoundException(id);
         }
         return foundStock.get();
     }
@@ -64,15 +62,13 @@ public class StockService {
     private void validateIfStockIsInLockPeriod(Stock foundStock) {
         // check if the stock is not updated in past 5minutes
         if(StockAppUtil.isWithinLockTime(foundStock)) {
-            // TODO: custom exception
-            throw new RuntimeException(StockAppUtil.ERROR_LOCK_WINDOW_ENABLED);
+            throw new LockWindowEnabledException();
         }
     }
 
     public Stock updateStock(long id, Stock stock) {
         if(!StockAppUtil.validateUpdateStock(stock)) {
-            throw new RuntimeException(StockAppUtil.ERROR_INVALID_UPDATE_REQUEST);
-            // TODO: custom exception
+            throw new InvalidUpdateRequestException();
         }
         // open transaction
         // check if the stock by id
