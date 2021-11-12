@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -79,6 +81,26 @@ public class StockServiceTest {
             Mockito.verify(mockRepository).findByName(sname);
             Mockito.verify(mockRepository, Mockito.never()).save(s1);
         }
+    }
+
+    @Test
+    public void testGetAllStocks() {
+        double currentPrice = 23.45;
+        String sname = "Stock";
+        Stock s1 = new Stock();
+        s1.setCurrentPrice(currentPrice);
+        s1.setName(sname+1);
+        Stock s2 = new Stock();
+        s2.setCurrentPrice(currentPrice);
+        s2.setName(sname+2);
+
+        List<Stock> expected = Arrays.asList(s1, s2);
+        Mockito.when(mockRepository.findAll()).thenReturn(expected);
+
+        Iterable<Stock> actual = service.getAllStocks();
+
+        Assert.assertEquals(expected, actual);
+        Mockito.verify(mockRepository).findAll();
     }
 
 }
