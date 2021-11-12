@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -123,6 +124,57 @@ public class StockServiceTest {
             // Assert.assertTrue(e instanceof RuntimeException);
             Assert.assertEquals(StockAppUtil.FN_ERROR_STOCK_WITH_ID_NOT_PRESENT.apply(id), e.getMessage());
             Mockito.verify(mockRepository).findById(id);
+        }
+    }
+
+
+    @Test
+    public void testDeleteStockByIdFoundStockNotInLockWindow() {
+        long id = 12;
+        long timePast10Mins = Instant.now()
+                .minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS*2)
+                .getEpochSecond();
+        Stock expected = new Stock();
+        expected.setLastUpdated(timePast10Mins);
+        Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
+        Stock actual = service.deleteStock(id);
+        Assert.assertEquals(expected, actual);
+        Mockito.verify(mockRepository).delete(expected);
+    }
+
+
+    @Test
+    public void testDeleteFailStockByIdNotFoundStockId() {
+        long id = 34;
+        Mockito.when(mockRepository.findById(id)).thenReturn(Optional.empty());
+        try {
+            service.deleteStock(id);
+            Assert.fail("Should not come here!");
+        } catch (Exception e) {
+            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertEquals(StockAppUtil.FN_ERROR_STOCK_WITH_ID_NOT_PRESENT.apply(id), e.getMessage());
+            Mockito.verify(mockRepository).findById(id);
+            Mockito.verify(mockRepository, Mockito.never()).delete(Mockito.any(Stock.class));
+        }
+    }
+
+    @Test
+    public void testDeleteFailStockByIdFoundStockWithingLockWindow() {
+        long id = 65;
+        long timePast2Mins = Instant.now()
+                .minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS/2)
+                .getEpochSecond();
+        Stock expected = new Stock();
+        expected.setLastUpdated(timePast2Mins);
+        Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
+        try {
+            service.deleteStock(id);
+            Assert.fail("Should not come here!");
+        } catch (Exception e) {
+            // Assert.assertTrue(e instanceof RuntimeException);
+            Assert.assertEquals(StockAppUtil.ERROR_LOCK_WINDOW_ENABLED, e.getMessage());
+            Mockito.verify(mockRepository).findById(id);
+            Mockito.verify(mockRepository, Mockito.never()).delete(expected);
         }
     }
 

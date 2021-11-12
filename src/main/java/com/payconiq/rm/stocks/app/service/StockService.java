@@ -49,4 +49,22 @@ public class StockService {
         return foundStock.get();
     }
 
+    public Stock deleteStock(long id) {
+        // open transaction
+        // check if the stock by id
+        Stock foundStock = getStockById(id);
+        // else delete the entry
+        validateIfStockIsInLockPeriod(foundStock);
+        stockRepository.delete(foundStock);
+        // close transaction
+        return foundStock;
+    }
+
+    private void validateIfStockIsInLockPeriod(Stock foundStock) {
+        // check if the stock is not updated in past 5minutes
+        if(StockAppUtil.isWithinLockTime(foundStock)) {
+            // TODO: custom exception
+            throw new RuntimeException(StockAppUtil.ERROR_LOCK_WINDOW_ENABLED);
+        }
+    }
 }
