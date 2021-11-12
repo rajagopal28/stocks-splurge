@@ -61,12 +61,12 @@ public class StockControllerTest {
         long id = 23;
         Mockito.when(mockService.getStockById(id)).thenReturn(expected);
 
-        ResponseEntity<Stock> getStockResponse = controller.getStock(id);
+        ResponseEntity<Stock> stockResponse = controller.getStock(id);
 
-        Assert.assertNotNull(getStockResponse);
-        Assert.assertEquals(HttpStatus.OK, getStockResponse.getStatusCode());
-        Assert.assertNotNull(getStockResponse.getBody());
-        Assert.assertEquals(expected, getStockResponse.getBody());
+        Assert.assertNotNull(stockResponse);
+        Assert.assertEquals(HttpStatus.OK, stockResponse.getStatusCode());
+        Assert.assertNotNull(stockResponse.getBody());
+        Assert.assertEquals(expected, stockResponse.getBody());
 
         Mockito.verify(mockService).getStockById(id);
     }
@@ -77,13 +77,29 @@ public class StockControllerTest {
         long id = 45;
         Mockito.when(mockService.updateStock(id, expected)).thenReturn(expected);
 
-        ResponseEntity<Stock> getStockResponse = controller.updateStock(id, expected);
+        ResponseEntity<Stock> stockResponse = controller.updateStock(id, expected);
 
-        Assert.assertNotNull(getStockResponse);
-        Assert.assertEquals(HttpStatus.OK, getStockResponse.getStatusCode());
-        Assert.assertNotNull(getStockResponse.getBody());
-        Assert.assertEquals(expected, getStockResponse.getBody());
+        Assert.assertNotNull(stockResponse);
+        Assert.assertEquals(HttpStatus.OK, stockResponse.getStatusCode());
+        Assert.assertNotNull(stockResponse.getBody());
+        Assert.assertEquals(expected, stockResponse.getBody());
 
         Mockito.verify(mockService).updateStock(id, expected);
+    }
+
+    @Test
+    public void testShouldDeleteOneStock() {
+        Stock expected = Mockito.mock(Stock.class);
+        long id = 45;
+        Mockito.when(mockService.deleteStock(id)).thenReturn(expected);
+
+        ResponseEntity<Stock> stockResponse = controller.deleteStock(id);
+
+        Assert.assertNotNull(stockResponse);
+        Assert.assertEquals(HttpStatus.OK, stockResponse.getStatusCode());
+        Assert.assertNotNull(stockResponse.getBody());
+        Assert.assertEquals(expected, stockResponse.getBody());
+
+        Mockito.verify(mockService).deleteStock(id);
     }
 }

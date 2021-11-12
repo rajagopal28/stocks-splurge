@@ -37,4 +37,10 @@ public class StockController {
     public ResponseEntity<Stock> updateStock(@PathVariable(name = "id") Long id,@RequestBody Stock stock) {
         return ResponseEntity.ok(service.updateStock(id, stock));
     }
+
+    @DeleteMapping(value = StockAppUtil.ENDPOINT_STOCKS_WITH_ID)
+    public ResponseEntity<Stock> deleteStock(@PathVariable(name = "id") Long id) {
+        return ResponseEntity.ok(service.deleteStock(id));
+    }
+
 }
