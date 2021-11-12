@@ -40,4 +40,20 @@ public class StockControllerTest {
         Mockito.verify(mockService).getAllStocks();
     }
 
+
+    @Test
+    public void testShouldPostNewStocks() {
+        Stock expected = Mockito.mock(Stock.class);
+        Mockito.when(mockService.addNewStock(expected)).thenReturn(expected);
+
+        ResponseEntity<Stock> addStockResponse = controller.addNewStock(expected);
+
+        Assert.assertNotNull(addStockResponse);
+        Assert.assertEquals(HttpStatus.CREATED, addStockResponse.getStatusCode());
+        Assert.assertNotNull(addStockResponse.getBody());
+        Assert.assertEquals(expected, addStockResponse.getBody());
+
+        Mockito.verify(mockService).addNewStock(expected);
+    }
+
 }

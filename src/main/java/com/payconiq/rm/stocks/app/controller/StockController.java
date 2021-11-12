@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController
 @Slf4j
 public class StockController {
@@ -18,6 +20,12 @@ public class StockController {
     @GetMapping(value = StockAppUtil.ENDPOINT_STOCKS)
     public ResponseEntity<Iterable<Stock>> getAllStocks() {
         return ResponseEntity.ok(service.getAllStocks());
+    }
+
+    @PostMapping(value = StockAppUtil.ENDPOINT_STOCKS)
+    public ResponseEntity<Stock> addNewStock(@RequestBody Stock stock) {
+        Stock newStock = service.addNewStock(stock);
+        return ResponseEntity.created(URI.create(StockAppUtil.ENDPOINT_STOCKS+newStock.getId())).body(newStock);
     }
 
 }
