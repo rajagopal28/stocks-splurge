@@ -28,4 +28,8 @@ public class StockController {
         return ResponseEntity.created(URI.create(StockAppUtil.ENDPOINT_STOCKS+newStock.getId())).body(newStock);
     }
 
+    @GetMapping(value = StockAppUtil.ENDPOINT_STOCKS_WITH_ID)
+    public ResponseEntity<Stock> getStock(@PathVariable(name = "id") Long id) {
+        return ResponseEntity.ok(service.getStockById(id));
+    }
 }

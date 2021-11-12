@@ -10,6 +10,7 @@ public interface StockAppUtil {
     long LOCK_WINDOW_IN_SECONDS = 60*5; // 5 minutes
 
     String ENDPOINT_STOCKS = "/api/stocks";
+    String ENDPOINT_STOCKS_WITH_ID = "/api/stocks/{id}";
     String ERROR_INVALID_REQUEST = "Invalid request data passed!";
     String ERROR_LOCK_WINDOW_ENABLED = "Cannot manipulate stock withing Lock window!";
     String ERROR_INVALID_UPDATE_REQUEST = "Blank request cannot be updated!";

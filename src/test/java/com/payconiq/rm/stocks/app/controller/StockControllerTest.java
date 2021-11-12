@@ -40,7 +40,6 @@ public class StockControllerTest {
         Mockito.verify(mockService).getAllStocks();
     }
 
-
     @Test
     public void testShouldPostNewStocks() {
         Stock expected = Mockito.mock(Stock.class);
@@ -56,4 +55,19 @@ public class StockControllerTest {
         Mockito.verify(mockService).addNewStock(expected);
     }
 
+    @Test
+    public void testShouldGetOneStock() {
+        Stock expected = Mockito.mock(Stock.class);
+        long id = 23;
+        Mockito.when(mockService.getStockById(id)).thenReturn(expected);
+
+        ResponseEntity<Stock> getStockResponse = controller.getStock(id);
+
+        Assert.assertNotNull(getStockResponse);
+        Assert.assertEquals(HttpStatus.OK, getStockResponse.getStatusCode());
+        Assert.assertNotNull(getStockResponse.getBody());
+        Assert.assertEquals(expected, getStockResponse.getBody());
+
+        Mockito.verify(mockService).getStockById(id);
+    }
 }
