@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,12 +16,12 @@ public class StockService {
 
     public Stock addNewStock(Stock stock) {
         // check if the stack object has all required attributes
-        if(StockAppUtil.validateStock(stock)) {
+        if(StockAppUtil.validateNewStock(stock)) {
             // validate if the name is not there
             Optional<Stock> stockByName = stockRepository.findByName(stock.getName());
             if(stockByName.isPresent()) {
                 //TODO:: create custom exception
-                throw new RuntimeException("Stock with Name("+stock.getName()+") already found!");
+                throw new RuntimeException(StockAppUtil.FN_ERROR_STOCK_WITH_NAME_PRESENT.apply(stock.getName()));
             }
             // set timestamp values
             long now = Instant.now().getEpochSecond();
@@ -33,11 +31,22 @@ public class StockService {
             return stockRepository.save(stock);
         } else {
             //TODO:: create custom exception
-            throw new RuntimeException("Invalid request data passed!");
+            throw new RuntimeException(StockAppUtil.ERROR_INVALID_REQUEST);
         }
     }
 
     public Iterable<Stock> getAllStocks() {
         return stockRepository.findAll();
     }
+
+    public Stock getStockById(long id) {
+        Optional<Stock> foundStock = stockRepository.findById(id);
+        // if not present throw error
+        if (foundStock.isEmpty()) {
+            // TODO: custom exception
+            throw new RuntimeException(StockAppUtil.FN_ERROR_STOCK_WITH_ID_NOT_PRESENT.apply(id));
+        }
+        return foundStock.get();
+    }
+
 }
