@@ -3,6 +3,7 @@ package com.payconiq.rm.stocks.app.service;
 import com.payconiq.rm.stocks.app.model.Stock;
 import com.payconiq.rm.stocks.app.repository.StockRepository;
 import com.payconiq.rm.stocks.app.util.StockAppUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,5 +67,25 @@ public class StockService {
             // TODO: custom exception
             throw new RuntimeException(StockAppUtil.ERROR_LOCK_WINDOW_ENABLED);
         }
+    }
+
+    public Stock updateStock(long id, Stock stock) {
+        if(!StockAppUtil.validateUpdateStock(stock)) {
+            throw new RuntimeException(StockAppUtil.ERROR_INVALID_UPDATE_REQUEST);
+            // TODO: custom exception
+        }
+        // open transaction
+        // check if the stock by id
+        Stock foundStock = getStockById(id);
+        validateIfStockIsInLockPeriod(foundStock);
+        if(StringUtils.isNotBlank(stock.getName())) {
+            foundStock.setName(stock.getName());
+        }
+        if(stock.getCurrentPrice() > 0) {
+            foundStock.setCurrentPrice(stock.getCurrentPrice());
+        }
+        foundStock.setLastUpdated(Instant.now().getEpochSecond());
+        // update entry
+        return stockRepository.save(foundStock);
     }
 }
