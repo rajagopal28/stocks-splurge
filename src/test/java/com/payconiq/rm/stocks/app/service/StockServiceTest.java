@@ -32,9 +32,7 @@ public class StockServiceTest {
     public void testAddStockWithProperData() {
         double currentPrice = 23.45;
         String sname = "Stock1";
-        Stock s1 = new Stock();
-        s1.setCurrentPrice(currentPrice);
-        s1.setName(sname);
+        Stock s1 = new Stock(sname, currentPrice);
 
         Mockito.when(mockRepository.findByName(sname)).thenReturn(Optional.empty());
         Mockito.when(mockRepository.save(s1)).thenReturn(s1);
@@ -49,8 +47,7 @@ public class StockServiceTest {
     @Test
     public void testAddStockWithInvalidDataGetException() {
          String sname = "Stock1";
-        Stock s1 = new Stock();
-        s1.setName(sname);
+        Stock s1 = new Stock(sname, 0);
         try {
            service.addNewStock(s1);
            Assert.fail("Should not come here!");
@@ -66,9 +63,7 @@ public class StockServiceTest {
     public void testAddStockWithValidDataButExistingStockGetException() {
         double currentPrice = 23.45;
         String sname = "Stock1";
-        Stock s1 = new Stock();
-        s1.setCurrentPrice(currentPrice);
-        s1.setName(sname);
+        Stock s1 = new Stock(sname, currentPrice);
 
         Mockito.when(mockRepository.findByName(sname)).thenReturn(Optional.of(s1));
 
@@ -87,12 +82,8 @@ public class StockServiceTest {
     public void testGetAllStocks() {
         double currentPrice = 23.45;
         String sname = "Stock";
-        Stock s1 = new Stock();
-        s1.setCurrentPrice(currentPrice);
-        s1.setName(sname+1);
-        Stock s2 = new Stock();
-        s2.setCurrentPrice(currentPrice);
-        s2.setName(sname+2);
+        Stock s1 = new Stock(sname+1, currentPrice);
+        Stock s2 = new Stock(sname+2, currentPrice);
 
         List<Stock> expected = Arrays.asList(s1, s2);
         Mockito.when(mockRepository.findAll()).thenReturn(expected);
@@ -107,7 +98,7 @@ public class StockServiceTest {
     @Test
     public void testGetStockByIdFoundStock() {
         long id = 12;
-        Stock expected = new Stock();
+        Stock expected = new Stock(null, 0);
         Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
         Stock actual = service.getStockById(id);
         Assert.assertEquals(expected, actual);
@@ -134,7 +125,7 @@ public class StockServiceTest {
         long timePast10Mins = Instant.now()
                 .minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS*2)
                 .getEpochSecond();
-        Stock expected = new Stock();
+        Stock expected = new Stock("sname", 0);
         expected.setLastUpdated(timePast10Mins);
         Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
         Stock actual = service.deleteStock(id);
@@ -163,7 +154,7 @@ public class StockServiceTest {
         long timePast2Mins = Instant.now()
                 .minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS/2)
                 .getEpochSecond();
-        Stock expected = new Stock();
+        Stock expected = new Stock("", 0);
         expected.setLastUpdated(timePast2Mins);
         Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
         try {
@@ -186,8 +177,7 @@ public class StockServiceTest {
 
         Stock expected = Mockito.mock(Stock.class);
         Mockito.when(expected.getLastUpdated()).thenReturn(timePast10Mins);
-        Stock updated = new Stock();
-        updated.setName("Stock2");
+        Stock updated = new Stock("Stock2", 0);
         Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
         Mockito.when(mockRepository.save(expected)).thenReturn(expected);
         Stock actual = service.updateStock(id, updated);
@@ -207,8 +197,7 @@ public class StockServiceTest {
 
         Stock expected = Mockito.mock(Stock.class);
         Mockito.when(expected.getLastUpdated()).thenReturn(timePast10Mins);
-        Stock updated = new Stock();
-        updated.setCurrentPrice(23.45);
+        Stock updated = new Stock("name", 23.45);
         Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
         Mockito.when(mockRepository.save(expected)).thenReturn(expected);
         Stock actual = service.updateStock(id, updated);

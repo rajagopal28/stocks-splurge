@@ -11,13 +11,9 @@ public class StockAppUtilTest {
     public void testValidateNewStock() {
         double currentPrice = Math.random() * 999;
         String sname = "Stock1";
-        Stock s1 = new Stock();
-        Stock s2 = new Stock();
-        Stock s3 = new Stock();
-        s1.setCurrentPrice(currentPrice);
-        s2.setCurrentPrice(currentPrice);
-        s1.setName(sname);
-        s3.setName(sname);
+        Stock s1 = new Stock(sname, currentPrice);
+        Stock s2 = new Stock("", currentPrice);
+        Stock s3 = new Stock(sname, 0);
 
         Assert.assertTrue(StockAppUtil.validateNewStock(s1));
         Assert.assertFalse(StockAppUtil.validateNewStock(s2));
@@ -29,14 +25,10 @@ public class StockAppUtilTest {
     public void testValidateUpdateStock() {
         double currentPrice = Math.random() * 999;
         String sname = "Stock1";
-        Stock s1 = new Stock();
-        Stock s2 = new Stock();
-        Stock s3 = new Stock();
-        Stock s4 = new Stock();
-        s1.setCurrentPrice(currentPrice);
-        s2.setCurrentPrice(currentPrice);
-        s1.setName(sname);
-        s3.setName(sname);
+        Stock s1 = new Stock(sname, currentPrice);
+        Stock s2 = new Stock("", currentPrice);
+        Stock s3 = new Stock(sname, 0);
+        Stock s4 = new Stock("", 0);
 
         Assert.assertTrue(StockAppUtil.validateUpdateStock(s1));
         Assert.assertTrue(StockAppUtil.validateUpdateStock(s2));

@@ -13,9 +13,7 @@ public class StockTest {
         long now = Instant.now().getEpochSecond();
         double currentPrice = Math.random() * 999;
         String sname = "Stock1";
-        Stock stock = new Stock();
-        stock.setCurrentPrice(currentPrice);
-        stock.setName(sname);
+        Stock stock = new Stock(sname, currentPrice);
         stock.setTimeCreated(now);
         stock.setLastUpdated(now);
 
