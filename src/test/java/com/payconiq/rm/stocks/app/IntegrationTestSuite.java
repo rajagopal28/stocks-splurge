@@ -284,6 +284,19 @@ public class IntegrationTestSuite {
         }
     }
 
+    @Test
+    public void testGetIndexPageHTML() {
+        try {
+            // test the API
+            mockMvc.perform(MockMvcRequestBuilders.get(StockAppUtil.ENDPOINT_HOME_INDEX)
+                    .contentType(MediaType.TEXT_HTML))
+                    .andExpect(MockMvcResultMatchers.status().isOk());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Should not come here!!");
+        }
+    }
+
     private Iterable<Stock> getStocksCreated(int count) {
         List<Stock> stocks = IntStream.range(0, count)
                 .mapToObj(i -> new Stock("Stock" + i, Math.random() * 9))

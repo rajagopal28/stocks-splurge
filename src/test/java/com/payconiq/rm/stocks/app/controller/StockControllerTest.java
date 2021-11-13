@@ -3,6 +3,7 @@ package com.payconiq.rm.stocks.app.controller;
 
 import com.payconiq.rm.stocks.app.model.Stock;
 import com.payconiq.rm.stocks.app.service.StockService;
+import com.payconiq.rm.stocks.app.util.StockAppUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -101,5 +103,13 @@ public class StockControllerTest {
         Assert.assertEquals(expected, stockResponse.getBody());
 
         Mockito.verify(mockService).deleteStock(id);
+    }
+
+
+    @Test
+    public void testShouldGetIndexHomePageModel() {
+        ModelAndView homeModel = controller.welcome();
+        Assert.assertNotNull(homeModel);
+        Assert.assertEquals(StockAppUtil.VIEW_NAME_HOME, homeModel.getViewName());
     }
 }

@@ -9,6 +9,8 @@ import java.util.function.Function;
 public interface StockAppUtil {
     long LOCK_WINDOW_IN_SECONDS = 60*5; // 5 minutes
 
+    String VIEW_NAME_HOME = "home.html";
+
     String ENDPOINT_HOME_INDEX = "/";
     String ENDPOINT_STOCKS = "/api/stocks";
     String ENDPOINT_STOCKS_WITH_ID = "/api/stocks/{id}";

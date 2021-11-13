@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.net.URI;
 
@@ -41,6 +42,13 @@ public class StockController {
     @DeleteMapping(value = StockAppUtil.ENDPOINT_STOCKS_WITH_ID)
     public ResponseEntity<Stock> deleteStock(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(service.deleteStock(id));
+    }
+
+    @GetMapping(value = StockAppUtil.ENDPOINT_HOME_INDEX)
+    public ModelAndView welcome() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(StockAppUtil.VIEW_NAME_HOME);
+        return modelAndView;
     }
 
 }
