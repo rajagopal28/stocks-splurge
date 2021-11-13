@@ -13,13 +13,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 
-import java.util.Arrays;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,7 +50,7 @@ public class IntegrationTestSuite {
                     content("{\"name\":\"A hiker has got lost\",\"currentPrice\":12.45}")
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.status().isCreated())
-                    .andExpect(MockMvcResultMatchers.content().json("{\"name\":\"A hiker has got lost\",\"currentPrice\":12.45, \"id\":1}"));
+                    .andExpect(MockMvcResultMatchers.content().json("{\"name\":\"A hiker has got lost\",\"currentPrice\":12.45}"));
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("Should not come here!!");
@@ -133,7 +132,119 @@ public class IntegrationTestSuite {
                     .andExpect(MockMvcResultMatchers.status().isOk())
                     .andExpect(MockMvcResultMatchers.content().json(getJsonStructureFromStocks(stocksCreated)));
             // delete records
-            stockRepository.deleteAll();
+            stockRepository.deleteAll(stocksCreated);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Should not come here!!");
+        }
+    }
+
+    @Test
+    public void testUpdateExistingStockOutsideLockWindow() {
+        try {
+            // insert one record
+            String name = "Stock1";
+            String newName = "Stock23";
+            Stock s1 = new Stock(name, 10.25);
+            s1.setLastUpdated(Instant.now().minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS+60).getEpochSecond());
+            Stock saved = stockRepository.save(s1);
+            saved.setName(newName);
+            // test the API
+            mockMvc.perform(MockMvcRequestBuilders.put(StockAppUtil.ENDPOINT_STOCKS+"/"+ saved.getId())
+                    .content("{\"name\":\""+newName+"\"}")
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.content().json(getJsonStructureFromStocks(Collections.singletonList(saved))));
+            // delete record
+            stockRepository.delete(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Should not come here!!");
+        }
+    }
+
+    @Test
+    public void testShouldNotUpdateExistingStockWithBlankRequest() {
+        try {
+            // insert one record
+            String name = "Stock1";
+            Stock s1 = new Stock(name, 10.25);
+            s1.setLastUpdated(Instant.now().minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS+60).getEpochSecond());
+            Stock saved = stockRepository.save(s1);
+            // test the API
+            mockMvc.perform(MockMvcRequestBuilders.put(StockAppUtil.ENDPOINT_STOCKS+"/"+ saved.getId())
+                    .content("{}")
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                    .andExpect(MockMvcResultMatchers.content().json("{\"message\": \"Blank request cannot be updated!\"}"));
+            // delete record
+            stockRepository.delete(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Should not come here!!");
+        }
+    }
+
+    @Test
+    public void testFailToUpdateExistingStockWithinLockWindow() {
+        try {
+            // insert one record
+            String name = "Stock1";
+            String newName = "Stock23";
+            Stock s1 = new Stock(name, 10.25);
+            s1.setLastUpdated(Instant.now().minusSeconds(60).getEpochSecond());
+            Stock saved = stockRepository.save(s1);
+            saved.setName(newName);
+            // test the API
+            mockMvc.perform(MockMvcRequestBuilders.put(StockAppUtil.ENDPOINT_STOCKS+"/"+ saved.getId())
+                    .content("{\"name\":\""+newName+"\"}")
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isForbidden())
+                    .andExpect(MockMvcResultMatchers.content().json("{\"message\": \"Cannot manipulate stock withing Lock window!\"}"));
+            // delete record
+            stockRepository.delete(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Should not come here!!");
+        }
+    }
+
+    @Test
+    public void testDeleteExistingStockOutsideLockWindow() {
+        try {
+            // insert one record
+            String name = "Stock1";
+            Stock s1 = new Stock(name, 10.25);
+            s1.setLastUpdated(Instant.now().minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS+60).getEpochSecond());
+            Stock saved = stockRepository.save(s1);
+            // test the API
+            mockMvc.perform(MockMvcRequestBuilders.delete(StockAppUtil.ENDPOINT_STOCKS+"/"+ saved.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.content().json(getJsonStructureFromStocks(Collections.singletonList(saved))));
+            // delete record
+            stockRepository.delete(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Should not come here!!");
+        }
+    }
+
+    @Test
+    public void testFailToDeleteExistingStockWithinLockWindow() {
+        try {
+            // insert one record
+            String name = "Stock1";
+            Stock s1 = new Stock(name, 10.25);
+            s1.setLastUpdated(Instant.now().minusSeconds(60).getEpochSecond());
+            Stock saved = stockRepository.save(s1);
+            // test the API
+            mockMvc.perform(MockMvcRequestBuilders.delete(StockAppUtil.ENDPOINT_STOCKS+"/"+ saved.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockMvcResultMatchers.status().isForbidden())
+                    .andExpect(MockMvcResultMatchers.content().json("{\"message\": \"Cannot manipulate stock withing Lock window!\"}"));
+            // delete record
+            stockRepository.delete(saved);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("Should not come here!!");
