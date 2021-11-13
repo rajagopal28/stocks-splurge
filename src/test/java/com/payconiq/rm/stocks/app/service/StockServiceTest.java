@@ -262,4 +262,33 @@ public class StockServiceTest {
             Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(Stock.class));
         }
     }
+
+    @Test
+    public void testUpdateStockByIdShouldFailForValidStockRequestOutsideLockWindowButWithDuplicateName() {
+        long id = 34;
+        String newName = "Stock2";
+        try {
+            long timePast2Mins = Instant.now()
+                    .minusSeconds(StockAppUtil.LOCK_WINDOW_IN_SECONDS*2)
+                    .getEpochSecond();
+
+            Stock request = Mockito.mock(Stock.class);
+            Mockito.when(request.getName()).thenReturn(newName);
+
+            Stock expected = Mockito.mock(Stock.class);
+            Mockito.when(expected.getName()).thenReturn("Stock1");
+            Mockito.when(expected.getLastUpdated()).thenReturn(timePast2Mins);
+
+            Mockito.when(mockRepository.findById(id)).thenReturn(Optional.of(expected));
+            Mockito.when(mockRepository.findByName(newName)).thenReturn(Optional.of(request));
+            service.updateStock(id, request);
+            Assert.fail("Should not come here!");
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof DuplicateStockException);
+            Assert.assertEquals(StockAppUtil.FN_ERROR_STOCK_WITH_NAME_PRESENT.apply(newName), e.getMessage());
+            Mockito.verify(mockRepository).findById(id);
+            Mockito.verify(mockRepository).findByName(newName);
+            Mockito.verify(mockRepository, Mockito.never()).save(Mockito.any(Stock.class));
+        }
+    }
 }

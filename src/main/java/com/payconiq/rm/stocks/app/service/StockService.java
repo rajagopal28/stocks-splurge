@@ -19,11 +19,7 @@ public class StockService {
     public Stock addNewStock(Stock stock) {
         // check if the stack object has all required attributes
         if(StockAppUtil.validateNewStock(stock)) {
-            // validate if the name is not there
-            Optional<Stock> stockByName = stockRepository.findByName(stock.getName());
-            if(stockByName.isPresent()) {
-                throw new DuplicateStockException(stock.getName());
-            }
+            validateIfAnyStockWithGivenName(stock.getName());
             // set timestamp values
             long now = Instant.now().getEpochSecond();
             stock.setLastUpdated(now);
@@ -32,6 +28,14 @@ public class StockService {
             return stockRepository.save(stock);
         } else {
             throw new InvalidCreateRequestException();
+        }
+    }
+
+    private void validateIfAnyStockWithGivenName(String name) {
+        // validate if the name is not there
+        Optional<Stock> stockByName = stockRepository.findByName(name);
+        if(stockByName.isPresent()) {
+            throw new DuplicateStockException(name);
         }
     }
 
@@ -75,6 +79,9 @@ public class StockService {
         Stock foundStock = getStockById(id);
         validateIfStockIsInLockPeriod(foundStock);
         if(StringUtils.isNotBlank(stock.getName())) {
+            if(!stock.getName().equals(foundStock.getName())) {
+                validateIfAnyStockWithGivenName(stock.getName());
+            }
             foundStock.setName(stock.getName());
         }
         if(stock.getCurrentPrice() > 0) {
