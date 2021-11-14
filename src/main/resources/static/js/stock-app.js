@@ -69,26 +69,30 @@ $(function() {
         var price = $( "#update-stock-price" ).val();
         console.log('invoking api update for '+id);
         var url = `./api/stocks/${id}`;
-        $.ajax({
-            url: url,
-            type:"PUT",
-            data: JSON.stringify({
-                "name": name,
-                "currentPrice" : price
-            }),
-            contentType:"application/json; charset=utf-8",
-            dataType:"json",
-            success: function(data, status){
-                console.log("Data: " , data , "Status: " , status);
-                if(status !== 'success') {
-                    announceUpdateIssue(data, status);
-                } else {
-                    $("#update-stock-dialog").dialog('close');
-                    getAllStocksData();
-                }
-            },
-            error: announceUpdateIssue
-        });
+        if(name.trim().length ===0 || price*1 <=0 ) {
+            errorMessageShow("#update-input-warning", '');
+        } else {
+            $.ajax({
+                url: url,
+                type:"PUT",
+                data: JSON.stringify({
+                    "name": name,
+                    "currentPrice" : price
+                }),
+                contentType:"application/json; charset=utf-8",
+                dataType:"json",
+                success: function(data, status){
+                    console.log("Data: " , data , "Status: " , status);
+                    if(status !== 'success') {
+                        announceUpdateIssue(data, status);
+                    } else {
+                        $("#update-stock-dialog").dialog('close');
+                        getAllStocksData();
+                    }
+                },
+                error: announceUpdateIssue
+            });
+        }
     });
      $("#add-confirm").click(function(e) {
         var name = $( "#stock-name" ).val();
@@ -97,11 +101,7 @@ $(function() {
         if(name.trim() ==0 || price*1 <=0 ) {
             console.log("info missing");
             // Run the effect
-            $( "#input-warning" ).show( 'explode', {}, 500, function() {
-                  setTimeout(function() {
-                    $( "#input-warning:visible" ).removeAttr("style").fadeOut();
-                  }, 1000 );
-                });
+            errorMessageShow("#input-warning", '');
         } else {
             $.ajax({
                 url:'./api/stocks',
@@ -128,35 +128,30 @@ $(function() {
         }
         console.log(e);
     });
+    errorMessageShow = function(element, error) {
+       if(error && error.length > 0) {
+           $(element).html(`Error:: ${error}`);
+       }
+        $(element).show( 'shake', {}, 500, function() {
+          setTimeout(function() {
+            $( `${element}:visible` ).removeAttr("style").fadeOut();
+          }, 2000 );
+        });
+    };
     announceUpdateIssue = function(data, status) {
         console.log(data, status);
         var error = (data && data.responseText && JSON.parse(data.responseText).message ? JSON.parse(data.responseText).message : 'Failed with status '+ status);
-        $("#update-response-error").html(`Error:: ${error}`);
-        $("#update-response-error" ).show( 'explode', {}, 500, function() {
-          setTimeout(function() {
-            $( "#update-response-error:visible" ).removeAttr("style").fadeOut();
-          }, 2000 );
-        });
+        errorMessageShow("#update-response-error", error);
     };
     announceDeleteIssue = function(data, status) {
         console.log(data, status);
         var error = (data && data.responseText && JSON.parse(data.responseText).message ? JSON.parse(data.responseText).message : 'Failed with status '+ status);
-        $("#delete-response-error").html(`Error:: ${error}`);
-        $("#delete-response-error" ).show( 'explode', {}, 500, function() {
-          setTimeout(function() {
-            $( "#delete-response-error:visible" ).removeAttr("style").fadeOut();
-          }, 2000 );
-        });
+        errorMessageShow("#delete-response-error", error);
     };
     announceAddIssue = function(data, status) {
         console.log(data, status);
         var error = (data && data.responseText && JSON.parse(data.responseText).message ? JSON.parse(data.responseText).message : 'Failed with status '+ status);
-        $("#add-response-error").html('Error::' + error);
-        $("#add-response-error" ).show( 'explode', {}, 5000, function() {
-          setTimeout(function() {
-            $( "#add-response-error:visible" ).removeAttr("style").fadeOut();
-          }, 2000 );
-        });
+        errorMessageShow("#add-response-error", error);
     };
     deleteF = function(id) {
         console.log("deleting ", id);
