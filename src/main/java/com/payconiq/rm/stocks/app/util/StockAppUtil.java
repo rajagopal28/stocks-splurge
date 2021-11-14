@@ -17,7 +17,7 @@ public interface StockAppUtil {
 
     String ERROR_REQUEST_VALIDATION_FAILED = "Validation failed";
     String ERROR_INVALID_REQUEST = "Invalid request data passed!";
-    String ERROR_LOCK_WINDOW_ENABLED = "Cannot manipulate stock withing Lock window!";
+    String ERROR_LOCK_WINDOW_ENABLED = "Cannot manipulate stock within Lock window!";
     String ERROR_INVALID_UPDATE_REQUEST = "Blank request cannot be updated!";
 
     Function<String, String> FN_ERROR_STOCK_WITH_NAME_PRESENT = (s) -> "Stock with Name("+s+") already found!";

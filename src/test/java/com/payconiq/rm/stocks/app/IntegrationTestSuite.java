@@ -125,6 +125,7 @@ public class IntegrationTestSuite {
     public void testGetAllStocksWithSomeDataExisting() {
         try {
             // insert records
+            stockRepository.deleteAll();
             Iterable<Stock> stocksCreated = getStocksCreated(3);
             // test the API
             mockMvc.perform(MockMvcRequestBuilders.get(StockAppUtil.ENDPOINT_STOCKS)
@@ -200,7 +201,7 @@ public class IntegrationTestSuite {
                     .content("{\"name\":\""+newName+"\"}")
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.status().isForbidden())
-                    .andExpect(MockMvcResultMatchers.content().json("{\"message\": \"Cannot manipulate stock withing Lock window!\"}"));
+                    .andExpect(MockMvcResultMatchers.content().json("{\"message\": \"Cannot manipulate stock within Lock window!\"}"));
             // delete record
             stockRepository.delete(saved);
         } catch (Exception e) {
@@ -242,7 +243,7 @@ public class IntegrationTestSuite {
             mockMvc.perform(MockMvcRequestBuilders.delete(StockAppUtil.ENDPOINT_STOCKS+"/"+ saved.getId())
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(MockMvcResultMatchers.status().isForbidden())
-                    .andExpect(MockMvcResultMatchers.content().json("{\"message\": \"Cannot manipulate stock withing Lock window!\"}"));
+                    .andExpect(MockMvcResultMatchers.content().json("{\"message\": \"Cannot manipulate stock within Lock window!\"}"));
             // delete record
             stockRepository.delete(saved);
         } catch (Exception e) {
