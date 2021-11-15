@@ -259,27 +259,41 @@ Content-Type: application/json
 ### Single page UI
 #### Home
 ![Home](./images/web/home.png)
+
+
 #### Add Stock
 ![Add-Stock](./images/web/new-stock.png)
+
 ![Add-Stock](./images/web/new-stock-warning.png)
+
+
 #### Update Stock
 ![Update-Stock](./images/web/update-stock.png)
+
 ![Update-Stock](./images/web/update-stock-warning.png)
+
 ![Update-Stock](./images/web/update-stock-error.png)
+
+
 #### Delete Stock
 ![Delete-Stock](./images/web/delete-stock-warning.png)
+
 ![Delete-Stock](./images/web/delete-stock-error.png)
 
 
 ### Test Coverage
 ![TestCoverage](./images/test-coverage-1.png)
+
 ![TestCoverage](./images/test-coverage-2.png)
+
 ![TestCoverage](./images/test-coverage-3.png)
 
 
 ### Dependencies
 ![Dependencies](./images/dependencies-1.png)
+
 ![Dependencies](./images/dependencies-2.png)
+
 ![Dependencies](./images/dependencies-3.png)
 
 ## Testing
@@ -304,6 +318,12 @@ $ mvn clean install -U
 Unit tests:
 ```bash
 $ mvn  test
+```
+
+## running the app locally in localhost:8080
+Application Server:
+```bash
+$ java  target/stocks-splurge-1.0.0.jar
 ```
 
 >         Developed in Jetbrain's IntelliJ IDE
