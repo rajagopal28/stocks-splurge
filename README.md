@@ -15,6 +15,7 @@ It is a minimal Proof of concept that adheres to the requirements mentioned in [
 - MVC test to support integration testing of the entire Spring Application.
 - Lombok - used annotation based pre-processing to reduce a lot of boilerplate code that can be deferred to compile time.
 - H2 in memory data base along with the persistence capabilities in java/spring-boot to enable in-memory data management.
+- Minimal UI : Single page UI with the stock CRUD operations created using jQuery UI with essential aspects with javascript and css. With my very minimal knowledge on styling and css I used jQuery UI to create a simpler app in a really limited amount of time.
 
 ## TDD - Red->Green->Refactor cycle
 ![TDD Diagram](./images/red-green-refactor.png)
